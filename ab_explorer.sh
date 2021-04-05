@@ -52,7 +52,7 @@ greetings_msg () {
  echo ""
  echo -e "\t let's get this block party started..."
  echo ""
- sleep 1 
+ sleep 3 
  }
 
 ####################################################
