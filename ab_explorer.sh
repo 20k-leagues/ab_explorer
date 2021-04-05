@@ -65,8 +65,8 @@ get_project_list () {
  for x in $PROJECT_IDS
   do
    echo '  grabbing the latestet metadata from '$API_PROJECT$x 
-  curl -s $API_PROJECT$x > project_$x.xml
-  sleep 2
+   curl -s $API_PROJECT$x > project_$x.xml
+   sleep 2
   done
  }
 
