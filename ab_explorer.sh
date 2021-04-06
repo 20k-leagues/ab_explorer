@@ -9,12 +9,12 @@
 #
 
 export TS=`date +%Y_%m%d_%H%M%S`
-export API_PLATFORM=https://api.artblocks.io/platform 
-export API_PROJECT=https://api.artblocks.io/project/ 
-export API_TOKEN_DATA=https://api.artblocks.io/token/ 
-export API_TOKEN_IMAGE=https://api.artblocks.io/image/ 
-export API_TOKEN_LIVE=https://api.artblocks.io/generator/ 
-export API_TOKEN_VOX=https://api.artblocks.io/vox/ 
+export API_PLATFORM=https://api.artblocks.io/platform
+export API_PROJECT=https://api.artblocks.io/project/
+export API_TOKEN_DATA=https://api.artblocks.io/token/
+export API_TOKEN_IMAGE=https://api.artblocks.io/image/
+export API_TOKEN_LIVE=https://api.artblocks.io/generator/
+export API_TOKEN_VOX=https://api.artblocks.io/vox/
 
 
 ####################################################
@@ -29,10 +29,12 @@ export API_TOKEN_VOX=https://api.artblocks.io/vox/
 
 greetings_msg () {
  clear
+ export GREEN='\033[0;32m'
+ export NOCOLOR='\033[0m'
  echo ""
- echo -e "\t greetings earthling!"
+ echo -e "\t        greetings earthling!"
  echo ""
- echo -e "\t               .--.   |V| "
+ echo -e "\t $GREEN              .--.   |V| "
  echo -e "\t              /    \ _| / "
  echo -e "\t              q .. p \ /  "
  echo -e "\t               \--/  //   "
@@ -40,19 +42,19 @@ greetings_msg () {
  echo -e "\t             /.    _/     "
  echo -e "\t            // \  /       "
  echo -e "\t           //   ||        "
- echo -e "\t           \\  /  \       "
+ echo -e "\t           \ \ /  \       "
  echo -e "\t            )\|    |      "
  echo -e "\t           / || || |      "
  echo -e "\t           |/\| || |      "
  echo -e "\t              | || |      "
  echo -e "\t              \ || /      "
  echo -e "\t            __/ || \__    "
- echo -e "\t           \____/\____/   "
+ echo -e "\t           \____/\____/ $NOCOLOR  "
  echo ""
  echo ""
  echo -e "\t let's get this block party started..."
  echo ""
- sleep 3 
+ sleep 3
  }
 
 ####################################################
@@ -64,14 +66,14 @@ get_project_list () {
  export PROJECT_IDS=`cat ./project_list.tmp`
  for x in $PROJECT_IDS
   do
-   echo '  grabbing the latestet metadata from '$API_PROJECT$x 
+   echo '  grabbing the latestet metadata from '$API_PROJECT$x
    curl -s $API_PROJECT$x > project_$x.xml
    sleep 2
   done
  }
 
 ####################################################
-#  parse project states & print out a summary 
+#  parse project states & print out a summary
 #
 #   a = project id
 #   b = project name (replace special characters)
@@ -88,16 +90,16 @@ get_project_list () {
 #   m = % minted
 #   n = tkn id start
 #   o = tkn id end
- 
+
 parse_project_states () {
  echo ""
  echo -e ",----,--------------------------,---------------------,--------,-----,----------,--------,--------,--------,----------,----------,-------------------------------------, ," > ./parse_project_states.tmp
  echo -e ", id , project name , artist , price , cur , mint max , minted , % sold , active , 1st tkn , last tkn , art blocks project url , ," >> ./parse_project_states.tmp
  echo -e ",----,--------------------------,---------------------,--------,-----,----------,--------,--------,--------,----------,----------,-------------------------------------, ," >> ./parse_project_states.tmp
   for x in `ls project_*.xml |sort -V`
-   do 
+   do
     echo "  parsing $x..."
-    export xml=`xmllint --format $x ` 
+    export xml=`xmllint --format $x `
     export a=`echo $x |sed 's/project_//g' |sed 's/.xml//g'`
     export b=`xmllint --format $x |grep h1.*Name |awk -F\: '{print $2}' |awk -F\< '{print $1}' |awk '{$1=$1};1' |sed 's/&#x14D;/o/g'|sed 's/&#x266B;//g' |awk '{$1=$1};1' `
     export c=`xmllint --format $x |grep h3.*Artist |awk -F\: '{print $2}' |awk -F\< '{print $1}' |awk '{$1=$1};1' |sed 's/&#xEF;/i/g' |sed 's/&#xF6;/o/g' |sed 's/&#xE9;/e/g' `
@@ -112,7 +114,7 @@ parse_project_states () {
     export l=`echo "https://www.artblocks.io/project/$a" `
     for mm in `seq 0 1000`; do mint_done=$((200*$h/$i % 2 + 100*$h/$i)); done; export m=`echo $mint_done"%"`
     export n=`xmllint --format $x |grep ' Ids:' |awk '{print $3}' |sed 's/<\/p>//g' |awk -F\, '{print $1}' `
-    export o=$(($n+$h-1)) 
+    export o=$(($n+$h-1))
     echo -e ", $a , $b , $c , $f , $g , $i , $h , $m , $k , $n , $o , $l , $p , ," >> ./parse_project_states.tmp
    done
  echo -e ",----,--------------------------,---------------------,--------,-----,----------,--------,--------,--------,----------,----------,-------------------------------------, ," >> ./parse_project_states.tmp
@@ -127,7 +129,7 @@ parse_project_states () {
 
 
 ####################################################
-# closing message 
+# closing message
 
 goodbye_msg () {
  echo ""
@@ -141,12 +143,10 @@ goodbye_msg () {
 ####################################################
 ####################################################
 #
-#  here we go... 
+#  here we go...
 #
 
 greetings_msg
 get_project_list
 parse_project_states
 goodbye_msg
-
-
