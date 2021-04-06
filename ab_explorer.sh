@@ -68,6 +68,7 @@ get_project_list () {
   do
    echo '  grabbing the latestet metadata from '$API_PROJECT$x
    curl -s $API_PROJECT$x > project_$x.xml
+   # be polite with this value, por favor my good citizen
    sleep 2
   done
  }
