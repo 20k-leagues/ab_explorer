@@ -114,7 +114,7 @@ parse_project_states () {
     export k=`xmllint --format $x |grep 'Active?' |awk '{print $2}' |sed 's/<\/p>//g' `
     export l=`echo "https://www.artblocks.io/project/$a" `
     for mm in `seq 0 1000`; do mint_done=$((200*$h/$i % 2 + 100*$h/$i)); done; export m=`echo $mint_done"%"`
-    export n=`xmllint --format $x |grep ' Ids:' |awk '{print $3}' |sed 's/<\/p>//g' |awk -F\, '{print $1}' `
+    export n=$(($a*1000000))
     export o=$(($n+$h-1))
     echo -e ", $a , $b , $c , $f , $g , $i , $h , $m , $k , $n , $o , $l , $p , ," >> ./parse_project_states.tmp
    done
