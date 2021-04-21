@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#
+
 # https://github.com/20k-leagues/ab_explorer
 
 ####################################################
@@ -68,7 +68,6 @@ get_project_list () {
   do
    echo '  grabbing the latestet metadata from '$API_PROJECT$x
    curl -s $API_PROJECT$x > project_$x.xml
-   # be polite with this value, por favor my good citizen
    sleep 2
   done
  }
@@ -91,18 +90,23 @@ get_project_list () {
 #   m = % minted
 #   n = tkn id start
 #   o = tkn id end
+#   p = license
 
 parse_project_states () {
  echo ""
- echo -e ",----,--------------------------,---------------------,--------,-----,----------,--------,--------,--------,----------,----------,-------------------------------------, ," > ./parse_project_states.tmp
- echo -e ", id , project name , artist , price , cur , mint max , minted , % sold , active , 1st tkn , last tkn , art blocks project url , ," >> ./parse_project_states.tmp
- echo -e ",----,--------------------------,---------------------,--------,-----,----------,--------,--------,--------,----------,----------,-------------------------------------, ," >> ./parse_project_states.tmp
-  for x in `ls project_*.xml |sort -V`
+#echo -e ",----,--------------------------,---------------------,--------,-----,----------,--------,--------,--------,----------,----------,-------------------------------------, ," > ./parse_project_states.tmp
+ echo -e ",----,--------------------------,---------------------,--------,-----,----------,--------,--------,--------,---------------, ," > ./parse_project_states.tmp
+#echo -e ", id , project name , artist , price , cur , mint max , minted , % sold , active , 1st tkn , last tkn , art blocks project url , ," >> ./parse_project_states.tmp
+ echo -e ", id , project name , artist , price , cur , mint max , minted , % sold , active , license , ," >> ./parse_project_states.tmp
+#echo -e ",----,--------------------------,---------------------,--------,-----,----------,--------,--------,--------,----------,----------,-------------------------------------, ," >> ./parse_project_states.tmp
+ echo -e ",----,--------------------------,---------------------,--------,-----,----------,--------,--------,--------,---------------, ," >> ./parse_project_states.tmp
+#  for x in `ls project_*.xml |sort -V`
+  for x in `ls project_*.xml |grep -v 52 |sort -V`
    do
     echo "  parsing $x..."
     export xml=`xmllint --format $x `
     export a=`echo $x |sed 's/project_//g' |sed 's/.xml//g'`
-    export b=`xmllint --format $x |grep h1.*Name |awk -F\: '{print $2}' |awk -F\< '{print $1}' |awk '{$1=$1};1' |sed 's/&#x14D;/o/g'|sed 's/&#x266B;//g' |awk '{$1=$1};1' `
+    export b=`xmllint --format $x |grep h1.*Name |awk -F\: '{print $2}' |awk -F\< '{print $1}' |awk '{$1=$1};1' |sed 's/&#x14D;/o/g' |sed 's/&#x266B;//g' |awk '{$1=$1};1' |sed 's/,//g'`
     export c=`xmllint --format $x |grep h3.*Artist |awk -F\: '{print $2}' |awk -F\< '{print $1}' |awk '{$1=$1};1' |sed 's/&#xEF;/i/g' |sed 's/&#xF6;/o/g' |sed 's/&#xE9;/e/g' `
 #   export d=`xmllint --format $x |grep Hashes.*Generated |awk '{print $5}' |sed 's/<\/p>//g' `
 #   export e=`xmllint --format $x |grep Dynamic.*Asset |awk '{print $3}' |sed 's/<\/p>//g' `
@@ -114,11 +118,15 @@ parse_project_states () {
     export k=`xmllint --format $x |grep 'Active?' |awk '{print $2}' |sed 's/<\/p>//g' `
     export l=`echo "https://www.artblocks.io/project/$a" `
     for mm in `seq 0 1000`; do mint_done=$((200*$h/$i % 2 + 100*$h/$i)); done; export m=`echo $mint_done"%"`
+#   export n=`xmllint --format $x |grep ' Ids:' |awk '{print $3}' |sed 's/<\/p>//g' |awk -F\, '{print $1}' `
     export n=$(($a*1000000))
     export o=$(($n+$h-1))
-    echo -e ", $a , $b , $c , $f , $g , $i , $h , $m , $k , $n , $o , $l , $p , ," >> ./parse_project_states.tmp
+    export p=`xmllint --format $x |grep '>License:' |awk -F\> '{print $2}' |awk -F\: '{print $2}' |awk -F\< '{print $1}' |awk '{$1=$1};1' `
+#   echo -e ", $a , $b , $c , $f , $g , $i , $h , $m , $k , $n , $o , $l , $p , ," >> ./parse_project_states.tmp
+    echo -e ", $a , $b , $c , $f , $g , $i , $h , $m , $k , $p , ," >> ./parse_project_states.tmp
    done
- echo -e ",----,--------------------------,---------------------,--------,-----,----------,--------,--------,--------,----------,----------,-------------------------------------, ," >> ./parse_project_states.tmp
+#echo -e ",----,--------------------------,---------------------,--------,-----,----------,--------,--------,--------,----------,----------,-------------------------------------, ," >> ./parse_project_states.tmp
+ echo -e ",----,--------------------------,---------------------,--------,-----,----------,--------,--------,--------,---------------, ," >> ./parse_project_states.tmp
  clear
  echo ""
  column -t -s "," parse_project_states.tmp |sed 's/^/   / ' > parse_project_states_$TS.log
